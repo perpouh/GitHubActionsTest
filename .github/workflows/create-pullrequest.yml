@@ -1,4 +1,4 @@
-name: TerraformPlan
+name: Create PullRequest
 
 on:
   workflow_dispatch:
@@ -36,7 +36,7 @@ jobs:
             "s|\"arn:aws:lambda:ap-northeast-1.*\"|\"${{inputs.lambda-layer-version}}\"|" \
             infra/terragrunt.hcl
 
-            rm terragrunt.hcl.bak
+            rm infra/terragrunt.hcl.bak
 
       - name: Set current datetime as env variable
         env:
