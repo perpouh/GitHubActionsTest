@@ -22,9 +22,6 @@ jobs:
       - name: Build layer
         run: |
           zip -r layer.zip lambda/
-
-      - name: Publish Lambda Layer
-        run: |
           LAYER_VERSION_ARN=$(aws lambda publish-layer-version \
             --layer-name tf-gha-test-layer \
             --zip-file fileb://layer.zip \
