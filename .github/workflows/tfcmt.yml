@@ -29,9 +29,9 @@ jobs:
         run: |
             sed -i.bak \
             "s|default = \".*\"|default = \"$LAYER_VERSION_ARN\"|" \
-            infra/live/dev/terragrunt.hcl
+            infra/terragrunt.hcl
 
-            rm terragrunt.hcl.bak
+            rm infra/terragrunt.hcl.bak
 
       - name: Set current datetime as env variable
         env:
