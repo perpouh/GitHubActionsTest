@@ -37,6 +37,11 @@ jobs:
 
             rm infra/terragrunt.hcl.bak
 
+      - name: Configure Git
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
       - name: Set current datetime as env variable
         env:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
