@@ -36,4 +36,4 @@ jobs:
 
       - name: Show Layer Version
         run: |
-          echo layer_version_arn
+          echo ${{LAYER_VERSION_ARN}}
