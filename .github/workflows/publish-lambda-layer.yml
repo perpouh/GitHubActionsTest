@@ -2,8 +2,12 @@ name: Publish Lambda Layer
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  create_issue_and_comment:
+  publish_lambda_layer:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -17,9 +21,10 @@ jobs:
 
       - name: Build layer
         run: |
-          zip -r layer.zip python/
+          zip -r layer.zip lambda/
 
       - name: Publish Lambda Layer
+        id: publish-layer
         run: |
           LAYER_VERSION_ARN=$(aws lambda publish-layer-version \
             --layer-name tf-gha-test-layer \
@@ -32,4 +37,4 @@ jobs:
 
       - name: Show Layer Version
         run: |
-          echo layer_version_arn
+          echo "${{ steps.publish-layer.outputs.layer_version_arn }}"
