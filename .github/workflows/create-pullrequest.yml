@@ -13,8 +13,7 @@ env:
   AWS_DEFAULT_REGION: ap-northeast-1
 
 permissions:
-  id-token: write
-  contents: read
+  contents: write
   pull-requests: write
 
 jobs:
@@ -46,6 +45,8 @@ jobs:
             echo "BRANCH_NAME=chore/update-layer-${CURRENT_DATETIME}" >> $GITHUB_ENV
 
       - name: Create PR
+        env:
+          GH_TOKEN: ${{ github.token }}
         run: |
             git checkout -b ${{ env.BRANCH_NAME }}
 
@@ -56,8 +57,6 @@ jobs:
 
             gh pr create \
             --title "Update Lambda Layer" \
-            --body "Automated update of Lambda Layer version."
-            --base main
+            --body "Automated update of Lambda Layer version." \
+            --base main \
             --head ${{ env.BRANCH_NAME }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
