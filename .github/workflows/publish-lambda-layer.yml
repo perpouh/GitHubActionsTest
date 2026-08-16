@@ -21,7 +21,7 @@ jobs:
 
       - name: Build layer
         run: |
-          zip -r layer.zip python/
+          zip -r layer.zip lambda/
 
       - name: Publish Lambda Layer
         run: |
