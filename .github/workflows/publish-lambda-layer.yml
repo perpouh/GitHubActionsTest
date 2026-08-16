@@ -2,8 +2,12 @@ name: Publish Lambda Layer
 on:
   workflow_dispatch:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
-  create_issue_and_comment:
+  publish_lambda_layer:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
