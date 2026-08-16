@@ -43,13 +43,13 @@ jobs:
           TZ: 'Asia/Tokyo' # タイムゾーン指定
         run: |
             CURRENT_DATETIME=$(date +'%Y%m%d%H%M%S')
-            echo "BRANCH_NAME=chore/update-layerー${CURRENT_DATETIME}" >> $GITHUB_ENV
+            echo "BRANCH_NAME=chore/update-layer-${CURRENT_DATETIME}" >> $GITHUB_ENV
 
       - name: Create PR
         run: |
             git checkout -b ${{ env.BRANCH_NAME }}
 
-            git add terraform.tfvars
+            git add infra/terragrunt.hcl
             git commit -m "Update Lambda Layer"
 
             git push origin ${{ env.BRANCH_NAME }}
