@@ -1,0 +1,35 @@
+name: Publish Lambda Layer
+on:
+  workflow_dispatch:
+
+jobs:
+  create_issue_and_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{secrets.LAMBDA_PUBLISHER}}
+          aws-region: ap-northeast-1
+
+      - name: Build layer
+        run: |
+          zip -r layer.zip python/
+
+      - name: Publish Lambda Layer
+        run: |
+          LAYER_VERSION_ARN=$(aws lambda publish-layer-version \
+            --layer-name tf-gha-test-layer \
+            --zip-file fileb://layer.zip \
+            --compatible-runtimes python3.12 \
+            --compatible-architectures arm64 \
+            --query 'LayerVersionArn' \
+            --output text)
+          echo "layer_version_arn=$LAYER_VERSION_ARN" >> "$GITHUB_OUTPUT"
+
+      - name: Show Layer Version
+        run: |
+          echo layer_version_arn
