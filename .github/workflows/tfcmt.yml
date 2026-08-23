@@ -8,6 +8,7 @@ on:
 env:
   TF_VERSION: 1.15.8
   AWS_DEFAULT_REGION: ap-northeast-1
+  TF_DIR: ./infra
 
 permissions:
   id-token: write
@@ -40,17 +41,21 @@ jobs:
       - name: Terraform init
         id: init
         run: terraform init
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform fmt
         id: fmt
         run: terraform fmt -check
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform validate
         id: validate
         run: terraform validate
+        working-directory: ${{ env.TF_DIR }}
 
       - name: Terraform plan
         id: plan
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: tfcmt plan -patch -- terraform plan -input=false
+        working-directory: ${{ env.TF_DIR }}
