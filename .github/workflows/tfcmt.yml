@@ -15,44 +15,42 @@ permissions:
   pull-requests: write
 
 jobs:
-  create-pr:
+  plan:
     runs-on: ubuntu-latest
     steps:
-      - name: Check input
-        if: inputs.lambda-layer-version == 'default'
-        run: exit 1;
-
       - name: Check out repository code
         uses: actions/checkout@v3
-    
-      - name: Update terragrunt.hcl
-        run: |
-            sed -i.bak \
-            "s|default = \".*\"|default = \"$LAYER_VERSION_ARN\"|" \
-            infra/terragrunt.hcl
 
-            rm infra/terragrunt.hcl.bak
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-region: ${{ env.AWS_DEFAULT_REGION }}
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
 
-      - name: Set current datetime as env variable
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v2
+        with:
+          terraform_version: ${{ env.TF_VERSION }}
+
+      - name: Setup tfcmt
+        uses: shmokmt/actions-setup-tfcmt@v2
+        with:
+          version: v4.6.0
+
+      - name: Terraform init
+        id: init
+        run: terraform init
+
+      - name: Terraform fmt
+        id: fmt
+        run: terraform fmt -check
+
+      - name: Terraform validate
+        id: validate
+        run: terraform validate
+
+      - name: Terraform plan
+        id: plan
         env:
-          TZ: 'Asia/Tokyo' # タイムゾーン指定
-        run: |
-            CURRENT_DATETIME=$(date +'%Y%m%d%H%M%S')
-            echo "BRANCH_NAME=chore/update-layerー${CURRENT_DATETIME}" >> $GITHUB_ENV
-
-      - name: Create PR
-        run: |
-            git checkout -b ${{ env.BRANCH_NAME }}
-
-            git add terraform.tfvars
-            git commit -m "Update Lambda Layer"
-
-            git push origin ${{ env.BRANCH_NAME }}
-
-            gh pr create \
-            --title "Update Lambda Layer" \
-            --body "Automated update of Lambda Layer version."
-            --base dev
-            --head ${{ env.BRANCH_NAME }}
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: tfcmt plan -patch -- terraform plan -input=false
